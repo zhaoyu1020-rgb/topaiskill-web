@@ -120,6 +120,7 @@ const mockNotifications = [
 // ==========================================
 export default function App() {
   const [lang, setLang] = useState('zh-CN');
+  const [isLangOpen, setIsLangOpen] = useState(false);
   const t = translations[lang] || translations['en'];
   
   const [toast, setToast] = useState(null);
@@ -280,7 +281,7 @@ export default function App() {
       {/* 3. Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-[100] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => {setActiveTab('explore'); setViewingSkill(null); setViewingCreator(null); setActiveTopCat(null); setSearchQuery('');}}>
+          <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 cursor-pointer" onClick={() => {setActiveTab('explore'); setViewingSkill(null); setViewingCreator(null); setActiveTopCat(null); setSearchQuery('');}}>
             <div className="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center shadow-inner"><Code className="text-white" size={20} /></div>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500 hidden sm:block">TopAISkill</span>
           </div>
@@ -291,11 +292,11 @@ export default function App() {
             {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-2.5 text-slate-400"><X size={16} /></button>}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-3">
             <div className="relative group hidden md:block">
-              <button className="flex items-center gap-1 text-sm text-slate-600 hover:text-indigo-600"><Globe size={16} /> {languages.find(l => l.code === lang)?.name}</button>
+              <button onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-1 text-sm text-slate-600 hover:text-indigo-600"><Globe size={16} /> {languages.find(l => l.code === lang)?.name}</button>
               <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg border border-slate-100 hidden group-hover:block z-50">
-                {languages.map(l => (<button key={l.code} onClick={() => setLang(l.code)} className="block w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700">{l.name}</button>))}
+                {isLangOpen && ({languages.map(l => (<button key={l.code} onClick={() => setLang(l.code); setIsLangOpen(false)} className="block w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700">{l.name}</button>))})}
               </div>
             </div>
 
@@ -325,7 +326,7 @@ export default function App() {
 
             {currentUser ? (
               <div className="relative group">
-                <div onClick={() => { setActiveTab('user'); setViewingSkill(null); setViewingCreator(null); }} className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1.5 rounded-lg transition">
+                <div onClick={() => { setActiveTab('user'); setViewingSkill(null); setViewingCreator(null); }} onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1.5 rounded-lg transition">
                   <div className="relative">
                     <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shadow-md">{currentUser.avatar}</div>
                     <div className="absolute -top-1 -right-1 bg-amber-400 text-white rounded-full p-0.5 border-2 border-white"><Crown size={10} /></div>
@@ -373,7 +374,7 @@ export default function App() {
             <div className="space-y-1">
               {industries.map(ind => (
                 <button key={ind.id} onClick={() => { setActiveTab('explore'); setActiveIndustry(ind.id); setActiveSubCat('All'); setActiveTopCat(null); }} className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition ${activeIndustry === ind.id && !activeTopCat ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}>
-                  <div className="flex items-center gap-3"><span className={activeIndustry === ind.id && !activeTopCat ? 'text-indigo-400' : 'text-slate-400'}>{ind.icon}</span><span>{ind.name}</span></div>
+                  <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-3"><span className={activeIndustry === ind.id && !activeTopCat ? 'text-indigo-400' : 'text-slate-400'}>{ind.icon}</span><span>{ind.name}</span></div>
                 </button>
               ))}
             </div>
@@ -400,7 +401,7 @@ export default function App() {
                      </div>
                    </div>
                    <h1 className="text-3xl font-black text-slate-900 mb-1">{viewingCreator.name}</h1>
-                   <div className="text-sm text-slate-500 mb-4 flex items-center gap-4"><span className="flex items-center gap-1"><Award size={14} className="text-amber-500"/> Verified Developer</span><span className="flex items-center gap-1"><LinkIcon size={14}/> github.com/{viewingCreator.name.toLowerCase()}</span></div>
+                   <div className="text-sm text-slate-500 mb-4 flex items-center gap-4"><span onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-1"><Award size={14} className="text-amber-500"/> Verified Developer</span><span onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-1"><LinkIcon size={14}/> github.com/{viewingCreator.name.toLowerCase()}</span></div>
                    <p className="text-slate-600 max-w-2xl text-sm leading-relaxed mb-6">{viewingCreator.bio}</p>
                    <div className="flex gap-8 border-t border-slate-100 pt-6">
                      <div><div className="text-2xl font-black text-slate-800">{viewingCreator.skills.length}</div><div className="text-xs text-slate-400 font-bold uppercase">已发布组件</div></div>
@@ -440,7 +441,7 @@ export default function App() {
                 <button onClick={() => setViewingSkill(null)} className="absolute top-4 left-4 text-slate-400 hover:text-white flex items-center gap-1 text-sm font-medium"><ArrowLeft size={16} /> 返回</button>
                 <div className="mt-8 flex flex-col md:flex-row justify-between items-start gap-4">
                   <div>
-                    <div className="flex items-center gap-3 mb-2">
+                    <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-3 mb-2">
                        <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs px-2 py-0.5 rounded uppercase font-bold tracking-wider">
                          {viewingSkill.industry ? industries.find(i=>i.id===viewingSkill.industry)?.name : topCategories.find(c=>c.id===viewingSkill.topCat)?.name}
                        </span>
@@ -479,7 +480,7 @@ export default function App() {
                 <div className="lg:col-span-2">
                   {activeDetailTab === 'overview' && (
                     <div className="prose prose-sm md:prose max-w-none prose-slate">
-                       <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-sm font-bold mb-6">
+                       <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 text-emerald-600 bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-sm font-bold mb-6">
                          <ShieldCheck size={18}/> 该版本代码已通过 AST 防投毒安全审查，且容器权限已被锁定。
                        </div>
                        <pre className="bg-slate-50 p-4 rounded-lg text-sm text-slate-700 whitespace-pre-wrap font-sans border border-slate-200">{viewingSkill.readme}</pre>
@@ -508,7 +509,7 @@ export default function App() {
                       {viewingSkill.reviews && viewingSkill.reviews.length > 0 ? viewingSkill.reviews.map((rev, i) => (
                         <div key={i} className="bg-white p-4 rounded-lg border border-slate-200">
                           <div className="flex justify-between mb-2">
-                            <div className="flex items-center gap-2"><span className="font-bold">{rev.user}</span>{rev.verified && <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 font-bold"><Check size={10}/> Verified Buyer</span>}</div>
+                            <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2"><span className="font-bold">{rev.user}</span>{rev.verified && <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 font-bold"><Check size={10}/> Verified Buyer</span>}</div>
                             <span className="text-xs text-slate-400">{rev.date}</span>
                           </div>
                           <div className="flex gap-1 mb-2">{[...Array(5)].map((_, idx) => <Star key={idx} size={12} className={idx < rev.rating ? "text-amber-400 fill-current" : "text-slate-200"}/>)}</div>
@@ -530,7 +531,7 @@ export default function App() {
                   </div>
                   <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
                     <h4 className="font-bold text-slate-800 mb-4">开发者</h4>
-                    <div className="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-lg" onClick={(e) => handleViewCreator(e, viewingSkill.author)}>
+                    <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-lg" onClick={(e) => handleViewCreator(e, viewingSkill.author)}>
                       <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex justify-center items-center font-bold text-lg">{viewingSkill.author.charAt(0)}</div>
                       <div>
                         <div className="font-bold text-sm text-indigo-600 hover:underline">@{viewingSkill.author}</div>
@@ -561,7 +562,7 @@ export default function App() {
                     if(!currentUser){setAuthModalMode('login'); return;} 
                     setPublishForm({...publishForm, category: activeTopCat ? topCategories.find(c=>c.id===activeTopCat)?.name : currentIndustryObj?.name});
                     setIsPublishModalOpen(true); 
-                  }} className="flex items-center gap-1 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-bold shadow-sm hover:bg-indigo-600 transition">
+                  }} onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-1 bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-bold shadow-sm hover:bg-indigo-600 transition">
                     <PlusCircle size={16} /> 发布 SKILL
                   </button>
                 </div>
@@ -592,10 +593,10 @@ export default function App() {
                           <div className="text-center"><div className="text-[10px] text-slate-400 uppercase font-bold">消耗/次</div><div className="text-sm font-black text-slate-700">{formatCost(skill.cost, lang)}</div></div>
                         </div>
                         <div className="flex justify-between items-center text-xs text-slate-500 mb-2">
-                           <div className="flex items-center gap-1 cursor-pointer hover:text-indigo-600 z-10 relative" onClick={(e) => handleViewCreator(e, skill.author)}>
+                           <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-1 cursor-pointer hover:text-indigo-600 z-10 relative" onClick={(e) => handleViewCreator(e, skill.author)}>
                               <div className="w-5 h-5 rounded-full bg-slate-800 text-white flex justify-center items-center font-bold text-[10px]">{skill.author.charAt(0)}</div><span className="font-bold underline decoration-slate-300">@{skill.author}</span>
                            </div>
-                           <div className="flex gap-3"><span className="flex items-center gap-1"><ThumbsUp size={12}/>{skill.likes.toLocaleString()}</span></div>
+                           <div className="flex gap-3"><span onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-1"><ThumbsUp size={12}/>{skill.likes.toLocaleString()}</span></div>
                         </div>
                       </div>
                       <div className="px-4 md:px-5 py-3 border-t border-slate-100 bg-slate-50 rounded-b-xl flex justify-between items-center">
@@ -621,7 +622,7 @@ export default function App() {
                 {mockBounties.map(b => (
                   <div key={b.id} className="border border-slate-200 rounded-lg p-5 flex flex-col md:flex-row justify-between md:items-center hover:border-indigo-300 transition">
                     <div className="mb-4 md:mb-0">
-                      <div className="flex items-center gap-2 mb-2"><h3 className="font-bold text-lg">{b.title}</h3>{b.status==='escrowed' && <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded font-bold uppercase flex gap-1"><CheckCircle2 size={12}/> 已托管</span>}</div>
+                      <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 mb-2"><h3 className="font-bold text-lg">{b.title}</h3>{b.status==='escrowed' && <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded font-bold uppercase flex gap-1"><CheckCircle2 size={12}/> 已托管</span>}</div>
                       <p className="text-sm text-slate-500 mb-2">{b.req}</p>
                       <div className="flex gap-2">{b.tags.map(t=><span key={t} className="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded-full">{t}</span>)}</div>
                     </div>
@@ -641,7 +642,7 @@ export default function App() {
           {/* ==================================================== */}
           {!viewingSkill && !viewingCreator && activeTab === 'user' && currentUser && (
              <div className="space-y-6 animate-fade-in-up">
-              <div className="flex items-center gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+              <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div className="w-16 h-16 rounded-full bg-slate-800 text-white flex justify-center items-center font-bold text-3xl shadow-lg">{currentUser.avatar}</div>
                 <div>
                   <h2 className="text-2xl font-bold flex items-center gap-2">{currentUser.name} <span className={`text-xs px-2 py-1 rounded bg-gradient-to-r ${currentUser.vipColor} text-white font-bold flex items-center gap-1`}><Crown size={12} /> {currentUser.vipLevel}</span></h2>
@@ -700,7 +701,7 @@ export default function App() {
                 <h3 className="text-lg font-bold mb-1 flex items-center gap-2"><Scale className="text-indigo-600" size={20}/> 资金仲裁中心 (Resolution Center)</h3>
                 <p className="text-xs text-slate-500 mb-4">保障交易双方资金安全，平台自动处理异常的 Token 消耗退款。</p>
                 <div className="border border-slate-100 rounded-lg p-4 flex justify-between items-center hover:bg-slate-50 cursor-pointer">
-                  <div className="flex items-center gap-3">
+                  <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex justify-center items-center"><AlertTriangle size={14}/></div>
                     <div>
                       <div className="text-sm font-bold">关于『穿透式财务审计』的退款争议</div>
@@ -807,12 +808,12 @@ export default function App() {
                   <section>
                     <h4 className="text-sm font-black text-slate-800 uppercase tracking-wide border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><div className="w-5 h-5 rounded bg-slate-800 text-white flex items-center justify-center text-xs">3</div> 商业模式</h4>
                     <div className="flex flex-wrap gap-4 mb-4">
-                       <label className="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" name="priceModel" checked={publishForm.priceModel==='free'} onChange={()=>setPublishForm({...publishForm, priceModel:'free'})} /> 完全免费开源</label>
-                       <label className="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" name="priceModel" checked={publishForm.priceModel==='license'} onChange={()=>setPublishForm({...publishForm, priceModel:'license'})}/> 一次性买断授权</label>
-                       <label className="flex items-center gap-2 text-sm cursor-pointer text-slate-400" title="暂未开放"><input type="radio" disabled /> 按调用次数计费</label>
+                       <label onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" name="priceModel" checked={publishForm.priceModel==='free'} onChange={()=>setPublishForm({...publishForm, priceModel:'free'})} /> 完全免费开源</label>
+                       <label onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" name="priceModel" checked={publishForm.priceModel==='license'} onChange={()=>setPublishForm({...publishForm, priceModel:'license'})}/> 一次性买断授权</label>
+                       <label onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 text-sm cursor-pointer text-slate-400" title="暂未开放"><input type="radio" disabled /> 按调用次数计费</label>
                     </div>
                     {publishForm.priceModel !== 'free' && (
-                      <div className="flex items-center gap-2 mb-4">
+                      <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 mb-4">
                          <span className="text-sm font-bold text-slate-700">授权费 (USD):</span>
                          <input type="number" defaultValue="9.9" className="w-24 border border-slate-200 rounded-md px-2 py-1 focus:ring-2 focus:ring-indigo-500 outline-none text-right font-mono font-bold" />
                       </div>
@@ -879,7 +880,7 @@ export default function App() {
               </div>
 
               {authModalMode !== 'forgot' && (
-                <div className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg bg-slate-50 mb-6 cursor-pointer hover:bg-slate-100 transition" onClick={() => setIsHumanVerified(!isHumanVerified)}>
+                <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg bg-slate-50 mb-6 cursor-pointer hover:bg-slate-100 transition" onClick={() => setIsHumanVerified(!isHumanVerified)}>
                   <div className={`w-5 h-5 rounded border flex items-center justify-center transition ${isHumanVerified ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 bg-white'}`}>
                     {isHumanVerified && <CheckCircle2 size={14} className="text-white" />}
                   </div><span className="text-sm font-medium text-slate-700 select-none">I am human / 防机器验证</span>
@@ -896,7 +897,7 @@ export default function App() {
 
               {authModalMode !== 'forgot' && (
                 <>
-                  <div className="flex items-center gap-2 my-5"><div className="h-px bg-slate-200 flex-1"></div><span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">第三方快捷接入</span><div className="h-px bg-slate-200 flex-1"></div></div>
+                  <div onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 my-5"><div className="h-px bg-slate-200 flex-1"></div><span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">第三方快捷接入</span><div className="h-px bg-slate-200 flex-1"></div></div>
                   <div className="space-y-3">
                     <button onClick={()=>handleLogin('google')} className="w-full flex justify-center items-center gap-2 bg-white border border-slate-300 py-2.5 rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 transition"><Chrome size={18} className="text-blue-500"/> Google</button>
                     <button onClick={()=>handleLogin('whatsapp')} className="w-full flex justify-center items-center gap-2 bg-[#25D366] text-white py-2.5 rounded-xl font-bold text-sm shadow-sm hover:bg-[#1ebd5a] transition"><MessageSquare size={18}/> WhatsApp</button>
